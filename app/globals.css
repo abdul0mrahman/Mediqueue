@@ -1,26 +1,90 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700;800&display=swap');
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ── DARK (default) ── */
+:root,
+[data-theme="dark"] {
+  --bg:       #0b0f1a;
+  --bg2:      #0f1524;
+  --surface:  #131b2e;
+  --surface2: #192236;
+  --surface3: #1e2a40;
+  --gold:     #c8a96e;
+  --gold2:    #e8c98e;
+  --gold-dim: rgba(200,169,110,0.15);
+  --border:   rgba(200,169,110,0.10);
+  --border2:  rgba(200,169,110,0.18);
+  --text:     #d4dff0;
+  --text2:    #8898b0;
+  --text3:    #4a5870;
+  --white:    #f0f4ff;
+  --shadow:   none;
+  --input-bg: #0f1524;
+  --grid-clr: rgba(200,169,110,0.02);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ── LIGHT ── */
+[data-theme="light"] {
+  --bg:       #f0f3fa;
+  --bg2:      #e3e8f4;
+  --surface:  #ffffff;
+  --surface2: #f4f6fc;
+  --surface3: #eaeef8;
+  --gold:     #8a6520;
+  --gold2:    #6a4e18;
+  --gold-dim: rgba(138,101,32,0.10);
+  --border:   rgba(138,101,32,0.12);
+  --border2:  rgba(138,101,32,0.20);
+  --text:     #1a2540;
+  --text2:    #3a4a6a;
+  --text3:    #6a7a9a;
+  --white:    #0d1520;
+  --shadow:   0 1px 12px rgba(0,0,0,0.06);
+  --input-bg: #eaeef8;
+  --grid-clr: rgba(138,101,32,0.025);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── SYSTEM THEME FALLBACK (when user hasn't set a manual preference) ── */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:       #f0f3fa;
+    --bg2:      #e3e8f4;
+    --surface:  #ffffff;
+    --surface2: #f4f6fc;
+    --surface3: #eaeef8;
+    --gold:     #8a6520;
+    --gold2:    #6a4e18;
+    --gold-dim: rgba(138,101,32,0.10);
+    --border:   rgba(138,101,32,0.12);
+    --border2:  rgba(138,101,32,0.20);
+    --text:     #1a2540;
+    --text2:    #3a4a6a;
+    --text3:    #6a7a9a;
+    --white:    #0d1520;
+    --shadow:   0 1px 12px rgba(0,0,0,0.06);
+    --input-bg: #eaeef8;
+    --grid-clr: rgba(138,101,32,0.025);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Manrope', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+/* subtle grid texture */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid-clr) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-clr) 1px, transparent 1px);
+  background-size: 48px 48px;
+  transition: background-image 0.35s ease;
 }
