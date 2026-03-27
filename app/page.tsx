@@ -15,7 +15,7 @@ export default function LandingPage() {
       return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
     };
 
-    const applyTheme = (themeValue) => {
+    const applyTheme = (themeValue: string) => {
       document.documentElement.setAttribute("data-theme", themeValue);
     };
 
@@ -46,7 +46,7 @@ export default function LandingPage() {
 
     // Listen for system theme changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
-    const handleThemeChange = (e) => {
+    const handleThemeChange = (e: MediaQueryListEvent) => {
       const newTheme = e.matches ? "light" : "dark";
       // Only update if no user preference is stored
       const hasUserPreference = localStorage.getItem("mq-theme") || 
@@ -378,6 +378,7 @@ export default function LandingPage() {
           background-clip: text;
           color: transparent;
           animation: shimmer 3s infinite;
+          background-size: 200% auto;
         }
 
         @keyframes shimmer {
@@ -425,6 +426,7 @@ export default function LandingPage() {
           overflow: hidden;
           cursor: pointer;
           text-align: center;
+          display: inline-block;
         }
 
         .btn-primary::before {
@@ -461,6 +463,7 @@ export default function LandingPage() {
           transition: all 0.3s ease;
           cursor: pointer;
           text-align: center;
+          display: inline-block;
         }
 
         .btn-secondary:hover {
@@ -496,6 +499,7 @@ export default function LandingPage() {
           transition: all 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
           position: relative;
           overflow: hidden;
+          display: block;
         }
 
         .portal-card::before {
@@ -731,5 +735,6 @@ export default function LandingPage() {
         </section>
       </div>
     </>
-  );
+ 
+);
 }

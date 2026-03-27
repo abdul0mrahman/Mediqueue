@@ -14,7 +14,7 @@ export default function AdminLoginPage() {
       return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
     };
 
-    const applyTheme = (themeValue) => {
+    const applyTheme = (themeValue: string) => {
       document.documentElement.setAttribute("data-theme", themeValue);
     };
 
@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
 
     // Listen for system theme changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
-    const handleThemeChange = (e) => {
+    const handleThemeChange = (e: MediaQueryListEvent) => {
       const newTheme = e.matches ? "light" : "dark";
       const hasUserPreference = localStorage.getItem("mq-theme") || 
         (() => {
@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
     if (sessionStorage.getItem("mq-admin")) router.push("/dashboard");
     
     return () => mediaQuery.removeEventListener("change", handleThemeChange);
-  }, []);
+  }, [router]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();

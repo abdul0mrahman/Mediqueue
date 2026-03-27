@@ -23,9 +23,9 @@ export default function PatientLoginPage() {
       return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
     };
 
-    const applyTheme = (themeValue) => {
+    const applyTheme = (themeValue: string) => {
       document.documentElement.setAttribute("data-theme", themeValue);
-      setTheme(themeValue);
+      setTheme(themeValue as "light" | "dark");
     };
 
     try {
@@ -51,7 +51,7 @@ export default function PatientLoginPage() {
 
     // Listen for system theme changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
-    const handleThemeChange = (e) => {
+    const handleThemeChange = (e: MediaQueryListEvent) => {
       const newTheme = e.matches ? "light" : "dark";
       const hasUserPreference = localStorage.getItem("mq-theme") || 
         (() => {
