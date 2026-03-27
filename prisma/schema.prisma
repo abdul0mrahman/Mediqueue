@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Notification {
@@ -14,7 +14,7 @@ model Notification {
   message       String
   read          Boolean  @default(false)
   createdAt     DateTime @default(now())
-  date          DateTime @default(now())  // ← ADD THIS
+  date          DateTime @default(now())
 }
 
 model Patient {
@@ -30,7 +30,7 @@ model Patient {
   waitSeconds      Int       @default(0)
   status           String    @default("waiting")
   patientUserId    Int?
-  date             DateTime  @default(now())  // ← ADD THIS
+  date             DateTime  @default(now())
 }
 
 model BoostEvent {
@@ -40,7 +40,7 @@ model BoostEvent {
   oldPriority Int
   newPriority Int
   reason      String
-  date        DateTime @default(now())  // ← ADD THIS
+  date        DateTime @default(now())
 }
 
 model PatientUser {
@@ -55,7 +55,6 @@ model PatientUser {
   emergencyContact String
   createdAt        DateTime       @default(now())
   visitHistory     VisitHistory[]
-  // No date needed for users - they persist
 }
 
 model VisitHistory {
@@ -65,5 +64,5 @@ model VisitHistory {
   condition     String
   priority      Int
   createdAt     DateTime    @default(now())
-  date          DateTime    @default(now())  // ← ADD THIS
+  date          DateTime    @default(now())
 }
