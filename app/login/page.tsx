@@ -1,9 +1,9 @@
+export const dynamic = 'force-dynamic';
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export const dynamic = 'force-dynamic';
 
 // ─── Inner component (uses useSearchParams) ───────────────────────────────────
 function PatientLoginContent() {
