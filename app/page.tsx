@@ -1,12 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [showLogo, setShowLogo] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [emergencyName, setEmergencyName] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -49,6 +52,28 @@ export default function LandingPage() {
       clearTimeout(timer);
     };
   }, []);
+
+  const handlePatientPortalClick = () => {
+    const savedPatient = localStorage.getItem("mq-patient");
+    if (savedPatient) {
+      router.push("/patient");
+    } else {
+      router.push("/login");
+    }
+  };
+
+  const handleEmergencyProceed = () => {
+    // Store emergency name if provided
+    if (emergencyName.trim()) {
+      localStorage.setItem("mq-emergency-name", emergencyName.trim());
+    }
+    // Mark session as emergency so patient portal allows access without login
+    localStorage.setItem("mq-emergency", "true");
+    setShowEmergencyModal(false);
+
+    // Always route directly to patient portal — emergency bypasses login
+    router.push("/patient?emergency=true");
+  };
 
   if (!mounted) return null;
 
@@ -136,7 +161,7 @@ export default function LandingPage() {
         .portals { display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(20px,5vw,32px);max-width:1000px;margin:60px auto 0;padding:0 20px; }
         @media(max-width:768px) { .portals { margin:40px auto 0;padding:0 16px; } }
 
-        .portal-card { background:var(--card-bg);backdrop-filter:blur(10px);border:1px solid var(--border-color);border-radius:24px;padding:clamp(28px,5vw,40px) clamp(20px,4vw,32px);text-decoration:none;transition:all 0.5s cubic-bezier(0.2,0.9,0.4,1.1);position:relative;overflow:hidden;display:block; }
+        .portal-card { background:var(--card-bg);backdrop-filter:blur(10px);border:1px solid var(--border-color);border-radius:24px;padding:clamp(28px,5vw,40px) clamp(20px,4vw,32px);text-decoration:none;transition:all 0.5s cubic-bezier(0.2,0.9,0.4,1.1);position:relative;overflow:hidden;display:block;cursor:pointer; }
         .portal-card::before { content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold-primary),var(--gold-light));transform:scaleX(0);transition:transform 0.5s ease; }
         .portal-card:hover { transform:translateY(-10px);border-color:var(--gold-primary);box-shadow:0 20px 40px rgba(0,0,0,0.5),0 0 30px rgba(212,175,55,0.1); }
         .portal-card:hover::before { transform:scaleX(1); }
@@ -177,8 +202,8 @@ export default function LandingPage() {
         .emergency-modal-input { width:100%;padding:13px 16px;background:rgba(232,80,58,0.04);border:1px solid rgba(232,80,58,0.25);border-radius:14px;color:var(--text-primary);font-family:'Cormorant Garamond',serif;font-size:16px;outline:none;margin-bottom:20px;transition:border-color 0.2s; }
         .emergency-modal-input:focus { border-color:#e8503a; }
         .emergency-modal-input::placeholder { color:var(--gray-mid);opacity:0.6; }
-        .btn-confirm-emergency { width:100%;padding:14px;background:linear-gradient(135deg,#e8503a,#c0392b);border:none;border-radius:50px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;color:#fff;letter-spacing:1.5px;cursor:pointer;margin-bottom:12px;transition:all 0.25s;text-transform:uppercase; }
-        .btn-confirm-emergency:hover { transform:translateY(-2px);box-shadow:0 10px 28px rgba(232,80,58,0.5); }
+        .btn-confirm-emergency-modal { width:100%;padding:14px;background:linear-gradient(135deg,#e8503a,#c0392b);border:none;border-radius:50px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;color:#fff;letter-spacing:1.5px;cursor:pointer;margin-bottom:12px;transition:all 0.25s;text-transform:uppercase;text-align:center;display:block;text-decoration:none; }
+        .btn-confirm-emergency-modal:hover { transform:translateY(-2px);box-shadow:0 10px 28px rgba(232,80,58,0.5); }
         .btn-cancel-emergency { width:100%;padding:12px;background:transparent;border:1px solid var(--border-color);border-radius:50px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;color:var(--gray-mid);cursor:pointer;transition:all 0.2s; }
         .btn-cancel-emergency:hover { border-color:rgba(232,80,58,0.3);color:#e8503a; }
         .emergency-disclaimer { margin-top:14px;padding:10px 14px;background:rgba(232,80,58,0.06);border:1px solid rgba(232,80,58,0.18);border-radius:11px;font-family:'Montserrat',sans-serif;font-size:8px;color:var(--gray-mid);text-align:center;line-height:1.6;letter-spacing:0.5px; }
@@ -218,16 +243,16 @@ export default function LandingPage() {
               className="emergency-modal-input"
               type="text"
               placeholder="Enter patient name…"
+              value={emergencyName}
+              onChange={(e) => setEmergencyName(e.target.value)}
               autoFocus
             />
-            <Link
-              href="/login?emergency=true"
-              className="btn-confirm-emergency"
-              style={{ display:"block", textAlign:"center", textDecoration:"none" }}
-              onClick={() => setShowEmergencyModal(false)}
+            <button
+              className="btn-confirm-emergency-modal"
+              onClick={handleEmergencyProceed}
             >
               🚨 Proceed to Emergency Admit
-            </Link>
+            </button>
             <button className="btn-cancel-emergency" onClick={() => setShowEmergencyModal(false)}>
               Cancel — Return to Home
             </button>
@@ -258,7 +283,9 @@ export default function LandingPage() {
 
             {/* Primary CTA Buttons */}
             <div className="hero-buttons">
-              <Link href="/login" className="btn-primary">Begin Your Journey</Link>
+              <button onClick={handlePatientPortalClick} className="btn-primary">
+                Begin Your Journey
+              </button>
               <Link href="/admin/login" className="btn-secondary">Staff Access</Link>
             </div>
 
@@ -274,7 +301,7 @@ export default function LandingPage() {
 
             {/* Portal Cards */}
             <div className="portals">
-              <Link href="/login" className="portal-card">
+              <div onClick={handlePatientPortalClick} className="portal-card" style={{ cursor: "pointer" }}>
                 <div className="portal-icon">🏥</div>
                 <div className="portal-label">PATIENT EXPERIENCE</div>
                 <div className="portal-title">Patient Portal</div>
@@ -283,7 +310,7 @@ export default function LandingPage() {
                   Experience healthcare reimagined.
                 </div>
                 <div className="portal-arrow">Access Portal →</div>
-              </Link>
+              </div>
 
               <Link href="/admin/login" className="portal-card">
                 <div className="portal-icon">⚡</div>
@@ -338,4 +365,4 @@ export default function LandingPage() {
       </div>
     </>
   );
-} 
+}

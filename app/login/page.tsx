@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function PatientLoginPage() {
   const router = useRouter();
@@ -10,7 +11,9 @@ export default function PatientLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
+const searchParams = useSearchParams();
+const isEmergency = searchParams.get("emergency") === "true";
+const [emergencyName, setEmergencyName] = useState("");
   const [login, setLogin] = useState({ username: "", password: "" });
   const [reg, setReg] = useState({
     username: "", password: "", confirmPassword: "",

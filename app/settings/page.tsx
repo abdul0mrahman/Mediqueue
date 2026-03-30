@@ -6,7 +6,7 @@ export default function SettingsPage() {
   const [theme, setThemeState] = useState<"dark" | "light">("dark");
   const [starvationThreshold, setStarvationThreshold] = useState(20);
   const [maxQueue, setMaxQueue] = useState(10);
-  const [hospitalName, setHospitalName] = useState("MediQueue+ Hospital");
+  const [hospitalName, setHospitalName] = useState("MediQueue Hospital");
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [criticalFlash, setCriticalFlash] = useState(true);
   const [saved, setSaved] = useState(false);
@@ -553,7 +553,7 @@ export default function SettingsPage() {
 
         <div className="page-header">
           <h1 className="page-title">Settings</h1>
-          <p className="page-sub">Configure your MediQueue+ system</p>
+          <p className="page-sub">Configure your MediQueue system</p>
         </div>
 
         {/* APPEARANCE */}

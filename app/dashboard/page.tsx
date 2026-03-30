@@ -601,7 +601,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="header">
           <div>
-            <div className="wordmark">MediQueue+</div>
+            <div className="wordmark">MediQueue</div>
             <div className="tagline">Admin Dashboard · AI-Powered Triage</div>
           </div>
           <div className="header-right">
