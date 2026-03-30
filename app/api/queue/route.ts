@@ -1,6 +1,5 @@
 // app/api/queue/route.ts
 import { PrismaClient } from "@prisma/client";
-
 const prisma = new PrismaClient();
 
 const STARVATION_MS = 20000;
