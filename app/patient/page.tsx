@@ -287,8 +287,6 @@ function ProfileModal({ patient, history, onClose, onUpdate }: {
   return (
     <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", backdropFilter:"blur(10px)", zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
       <div style={{ background:"var(--card-bg)", border:"1px solid var(--border-color)", borderRadius:28, maxWidth:560, width:"100%", maxHeight:"90vh", overflow:"auto", boxShadow:"0 40px 80px rgba(0,0,0,0.3)" }}>
-
-        {/* Header */}
         <div style={{ padding:"20px 24px 0", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div>
             <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:8, fontWeight:700, color:"var(--gold-primary)", letterSpacing:"3px", textTransform:"uppercase", marginBottom:4 }}>Patient Profile</div>
@@ -296,8 +294,6 @@ function ProfileModal({ patient, history, onClose, onUpdate }: {
           </div>
           <button onClick={onClose} style={{ width:34, height:34, borderRadius:"50%", border:"1px solid var(--border-color)", background:"transparent", cursor:"pointer", color:"var(--gray-mid)", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
         </div>
-
-        {/* Avatar + Name */}
         <div style={{ padding:"20px 24px", display:"flex", alignItems:"center", gap:18, borderBottom:"1px solid var(--border-color)" }}>
           <div style={{ position:"relative", flexShrink:0 }}>
             <div style={{ width:80, height:80, borderRadius:"50%", border:"2px solid var(--gold-primary)", backgroundImage:profilePhoto ? `url(${profilePhoto})` : "none", backgroundSize:"cover", backgroundPosition:"center", background:profilePhoto ? undefined : "var(--surface2)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Cormorant Garamond',serif", fontSize:28, fontWeight:700, color:"var(--gold-primary)" }}>
@@ -317,8 +313,6 @@ function ProfileModal({ patient, history, onClose, onUpdate }: {
             {editing ? "Cancel" : "Edit"}
           </button>
         </div>
-
-        {/* Info Grid (view mode) */}
         {!editing && (
           <div style={{ padding:"20px 24px", borderBottom:"1px solid var(--border-color)" }}>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
@@ -338,8 +332,6 @@ function ProfileModal({ patient, history, onClose, onUpdate }: {
             </div>
           </div>
         )}
-
-        {/* Edit Form */}
         {editing && (
           <div style={{ padding:"20px 24px", borderBottom:"1px solid var(--border-color)" }}>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
@@ -377,8 +369,6 @@ function ProfileModal({ patient, history, onClose, onUpdate }: {
             </button>
           </div>
         )}
-
-        {/* Visit History */}
         <div style={{ padding:"20px 24px" }}>
           <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:8, fontWeight:700, color:"var(--gold-primary)", letterSpacing:"2.5px", textTransform:"uppercase", marginBottom:14, display:"flex", alignItems:"center", gap:7 }}>
             <div style={{ width:5, height:5, borderRadius:"50%", background:"var(--gold-primary)", boxShadow:"0 0 6px var(--gold-primary)" }}/>
@@ -401,7 +391,6 @@ function ProfileModal({ patient, history, onClose, onUpdate }: {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
@@ -413,37 +402,42 @@ function ProfileModal({ patient, history, onClose, onUpdate }: {
 export default function PatientPortal() {
   const router = useRouter();
 
-  const [patient, setPatient]         = useState<PatientUser|null>(null);
-  // ── FIX: store the raw queue entry id separately so token survives re-renders ──
-  const [myQueueId, setMyQueueId]     = useState<number|null>(null);
-  const [myEntry, setMyEntry]         = useState<QueueEntry|null>(null);
-  const [condition, setCondition]     = useState("");
-  const [aiLoading, setAiLoading]     = useState(false);
-  const [aiResult, setAiResult]       = useState<{priority:number;reasoning:string;keywords:string[]}|null>(null);
-  const [submitted, setSubmitted]     = useState(false);
-  const [error, setError]             = useState("");
-  const [queueSize, setQueueSize]     = useState(0);
-  const [allPatients, setAllPatients] = useState<LivePatient[]>([]);
-  const [pageLoading, setPageLoading] = useState(true);
-  const [history, setHistory]         = useState<{condition:string;priority:number;date:string}[]>([]);
-  const [showHistory, setShowHistory] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [filteredSuggs, setFilteredSuggs]     = useState<string[]>([]);
-  const [posFlash, setPosFlash]       = useState(false);
-  const [priorityEvents, setPriorityEvents]   = useState<{time:string;priority:number;note:string}[]>([]);
-  const [activeTab, setActiveTab]     = useState<"status"|"tips"|"actions">("status");
+  // ── ALL STATE DECLARATIONS (must be before any JSX/return) ────────────
+  const [patient, setPatient]               = useState<PatientUser|null>(null);
+  const [myQueueId, setMyQueueId]           = useState<number|null>(null);
+  const [myEntry, setMyEntry]               = useState<QueueEntry|null>(null);
+  const [condition, setCondition]           = useState("");
+  const [aiLoading, setAiLoading]           = useState(false);
+  const [aiResult, setAiResult]             = useState<{priority:number;reasoning:string;keywords:string[]}|null>(null);
+  const [submitted, setSubmitted]           = useState(false);
+  const [error, setError]                   = useState("");
+  const [queueSize, setQueueSize]           = useState(0);
+  const [allPatients, setAllPatients]       = useState<LivePatient[]>([]);
+  const [pageLoading, setPageLoading]       = useState(true);
+  const [history, setHistory]               = useState<{condition:string;priority:number;date:string}[]>([]);
+  const [showHistory, setShowHistory]       = useState(false);
+  const [showSuggestions, setShowSuggestions]     = useState(false);
+  const [filteredSuggs, setFilteredSuggs]         = useState<string[]>([]);
+  const [posFlash, setPosFlash]             = useState(false);
+  const [priorityEvents, setPriorityEvents] = useState<{time:string;priority:number;note:string}[]>([]);
+  const [activeTab, setActiveTab]           = useState<"status"|"tips"|"actions">("status");
   const [showSymptomsPanel, setShowSymptomsPanel] = useState(false);
   const [checkedSymptoms, setCheckedSymptoms]     = useState<string[]>([]);
-  const [rightPanel, setRightPanel]   = useState<"queue"|"chat"|null>(null);
-  const [chatMsgs, setChatMsgs]       = useState<ChatMsg[]>([]);
-  const [chatInput, setChatInput]     = useState("");
-  const [chatLoading, setChatLoading] = useState(false);
-  const [chatStarted, setChatStarted] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
-  const [profilePhoto, setProfilePhoto] = useState<string>(() => {
+  const [rightPanel, setRightPanel]         = useState<"queue"|"chat"|null>(null);
+  const [chatMsgs, setChatMsgs]             = useState<ChatMsg[]>([]);
+  const [chatInput, setChatInput]           = useState("");
+  const [chatLoading, setChatLoading]       = useState(false);
+  const [chatStarted, setChatStarted]       = useState(false);
+  const [showProfile, setShowProfile]       = useState(false);
+  const [profilePhoto, setProfilePhoto]     = useState<string>(() => {
     try { return localStorage.getItem("mq-profile-photo") || ""; } catch { return ""; }
   });
+  // ── Emergency state (must be declared here with all other state) ──
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [emergencyName, setEmergencyName]           = useState("");
+  const [emergencyLoading, setEmergencyLoading]     = useState(false);
 
+  // ── REFS ──────────────────────────────────────────────────────────────
   const prevBoosted      = useRef(false);
   const prevPosition     = useRef<number|null>(null);
   const prevPriority     = useRef<number|null>(null);
@@ -452,7 +446,7 @@ export default function PatientPortal() {
   const chatInputRef     = useRef<HTMLTextAreaElement>(null);
   const approachAlerted  = useRef(false);
 
-  // Keep profilePhoto in sync with localStorage changes (e.g. from ProfileModal)
+  // Keep profilePhoto in sync
   useEffect(() => {
     const sync = () => {
       try { setProfilePhoto(localStorage.getItem("mq-profile-photo") || ""); } catch {}
@@ -485,43 +479,32 @@ export default function PatientPortal() {
   }, []);
 
   // ── Queue polling ──────────────────────────────────────────────────────
-  // FIX: match by patientUserId with robust fallback, preserve myQueueId
   const fetchQueue = useCallback(async (patientId?: number) => {
     try {
       const res = await fetch("/api/queue");
       const data = await res.json();
-
       const enriched: LivePatient[] = (data.queue ?? []).map((e: any, i: number) => {
-        // Normalise the user-id field — backends vary
         const userId =
           e.patientUserId != null ? Number(e.patientUserId) :
           e.patientId     != null ? Number(e.patientId)     :
           e.userId        != null ? Number(e.userId)        : undefined;
-
         return {
           id:           e.id ?? i + 1,
           name:         e.name ?? "Patient",
           condition:    e.condition,
           priority:     e.priority ?? 1,
-          // Each position ahead = ~5 minutes estimated wait
-waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
+          waitSeconds:  Math.max(0, i * 300),
           boosted:      e.boosted ?? false,
           patientUserId: userId,
           position:     i + 1,
         };
       });
-
       setQueueSize(enriched.length);
       setAllPatients(enriched);
-
       if (patientId) {
-        // Primary match: patientUserId
         let entry = enriched.find(p => p.patientUserId === patientId);
-
         if (entry) {
-          // Persist the queue row id (token number) once we first see it
           setMyQueueId(prev => prev ?? entry!.id);
-
           const qEntry: QueueEntry = {
             id:            entry.id,
             patientUserId: entry.patientUserId,
@@ -531,7 +514,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
             boosted:       entry.boosted,
           };
           setMyEntry(qEntry);
-
           if (prevPosition.current !== null && prevPosition.current !== entry.position) {
             setPosFlash(true); setTimeout(() => setPosFlash(false), 800);
           }
@@ -552,7 +534,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
           prevPosition.current = entry.position;
           prevBoosted.current  = entry.boosted;
         }
-        // If not found, keep existing myEntry — don't null it out between polls
       }
     } catch (err) {
       console.error("Queue fetch error:", err);
@@ -567,7 +548,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
 
   useEffect(() => {
     if (patient && submitted) {
-      // Poll aggressively after joining — every 1.5s for the first 15s
       let count = 0;
       const aggressive = setInterval(() => {
         fetchQueue(patient.id);
@@ -657,6 +637,37 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
     setAiLoading(false);
   }
 
+  async function submitEmergency() {
+    const name = emergencyName.trim() || patient?.name || "Emergency Patient";
+    if (!patient) return;
+    setEmergencyLoading(true);
+    try {
+      const res = await fetch("/api/queue", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          condition: "EMERGENCY — immediate assistance required",
+          priority: 5,
+          patientUserId: patient.id,
+        }),
+      });
+      if (!res.ok) { const d = await res.json(); setError(d.error || "Emergency admit failed"); setEmergencyLoading(false); return; }
+      const responseData = await res.json().catch(() => ({}));
+      if (responseData?.entry?.id || responseData?.id) {
+        const newId = responseData?.entry?.id ?? responseData?.id;
+        setMyQueueId(newId);
+        setMyEntry({ id: newId, patientUserId: patient.id, priority: 5, position: 0, waitSeconds: 0, boosted: false });
+      }
+      playJoinChime(); haptic([100, 50, 100, 50, 200]);
+      prevPriority.current = 5;
+      setPriorityEvents([{ time: new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}), priority: 5, note: "🚨 Emergency admit — Critical priority assigned" }]);
+      setShowEmergencyModal(false);
+      setEmergencyName("");
+      setSubmitted(true);
+    } catch { setError("Emergency admit failed. Please try again."); }
+    setEmergencyLoading(false);
+  }
+
   async function confirmSubmit() {
     if (!aiResult || !patient) return;
     const full = buildFullCondition();
@@ -666,15 +677,12 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
         body: JSON.stringify({ name:patient.name, condition:full, priority:aiResult.priority, patientUserId:patient.id }),
       });
       if (!res.ok) { const d = await res.json(); setError(d.error || "Failed to join queue"); return; }
-
-      // ── FIX: capture the returned queue entry id as the token ──
       const responseData = await res.json().catch(() => ({}));
       if (responseData?.entry?.id || responseData?.id) {
         const newId = responseData?.entry?.id ?? responseData?.id;
         setMyQueueId(newId);
         setMyEntry({ id: newId, patientUserId: patient.id, priority: aiResult.priority, position: 0, waitSeconds: 0, boosted: false });
       }
-
       playJoinChime(); haptic([40,30,40]);
       prevPriority.current = aiResult.priority;
       setPriorityEvents([{ time: new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}), priority: aiResult.priority, note: `Joined — AI assessed as ${SEV[aiResult.priority].label}` }]);
@@ -698,12 +706,12 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
     localStorage.setItem("mq-patient", JSON.stringify(updated));
   }
 
-  // ── Token display: prefer myQueueId (stable), fall back to myEntry.id ──
+  // ── Derived values ──
   const tokenId    = myQueueId ?? myEntry?.id ?? null;
   const tokenStr   = tokenId != null ? `#${String(tokenId).padStart(3, "0")}` : null;
   const waitSecs   = myEntry?.waitSeconds ?? 0;
   const waitMins   = Math.floor(waitSecs / 60);
-  const waitDisp = waitSecs <= 0 ? "Now" : waitMins > 0 ? `~${waitMins}m` : `<1m`;
+  const waitDisp   = waitSecs <= 0 ? "Now" : waitMins > 0 ? `~${waitMins}m` : `<1m`;
   const healthTips = getHealthTips(condition);
   const initials   = patient?.name?.split(" ").map(n => n[0]).join("").toUpperCase().slice(0,2) || "?";
 
@@ -716,6 +724,7 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
     return allPatients.slice(start, end);
   })();
 
+  // ── RENDER ────────────────────────────────────────────────────────────
   return (
     <>
       <style>{`
@@ -751,45 +760,35 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
         .panel-toggle-btn { font-family:'Montserrat',sans-serif;font-size:8px;font-weight:700;padding:5px 13px;border-radius:100px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all 0.25s;border:1px solid var(--border-color);background:transparent;color:var(--gray-mid); }
         .panel-toggle-btn:hover { border-color:var(--gold-primary);color:var(--gold-primary);background:var(--gold-dim); }
         .panel-toggle-btn.active { background:var(--gold-dim);border-color:var(--gold-primary);color:var(--gold-primary); }
-
-        /* Avatar button in header */
         .avatar-btn { width:34px;height:34px;border-radius:50%;border:2px solid var(--gold-primary);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:700;color:var(--gold-primary);overflow:hidden;transition:all 0.2s;flex-shrink:0; }
         .avatar-btn:hover { box-shadow:0 0 0 3px var(--gold-glow); }
-
         .content-row { display:flex;gap:16px;width:100%;max-width:1100px;align-items:flex-start; }
         .main-col { flex:1;min-width:0; }
         .side-panel { width:0;overflow:hidden;transition:width 0.35s cubic-bezier(0.16,1,0.3,1),opacity 0.3s;opacity:0;flex-shrink:0; }
         .side-panel.open { width:340px;opacity:1; }
-
         .main-card { background:var(--card-bg);border:1px solid var(--border-color);border-radius:24px;width:100%;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,0.1); }
         .sec-head { padding:13px 20px;background:var(--surface);border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between; }
         .sec-title { font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;color:var(--gold-primary);letter-spacing:2.5px;text-transform:uppercase;display:flex;align-items:center;gap:7px; }
         .sec-dot { width:5px;height:5px;border-radius:50%;background:var(--gold-primary);box-shadow:0 0 6px var(--gold-primary); }
-
         .form-body { padding:20px; }
         .field-label { display:block;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:600;color:var(--gray-mid);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px; }
         .field-input { width:100%;padding:12px 15px;background:var(--input-bg);border:1px solid var(--border-color);border-radius:13px;color:var(--text-primary);font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:500;outline:none;transition:all 0.3s;resize:vertical;min-height:78px; }
         .field-input:focus { border-color:var(--gold-primary);box-shadow:0 0 0 3px rgba(212,175,55,0.07); }
         .field-input::placeholder { color:var(--gray-mid);opacity:0.6; }
-
         .sugg-dropdown { position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--card-bg);border:1px solid var(--border-color);border-radius:13px;overflow:hidden;z-index:50;box-shadow:0 12px 32px rgba(0,0,0,0.12);animation:fadeUp 0.15s ease; }
         .sugg-item { padding:10px 15px;font-family:'Cormorant Garamond',serif;font-size:14px;color:var(--text-secondary);cursor:pointer;transition:background 0.1s;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:9px; }
         .sugg-item:last-child { border-bottom:none; }
         .sugg-item:hover { background:var(--gold-dim);color:var(--gold-primary); }
-
         .quick-chip { padding:5px 11px;background:var(--surface);border:1px solid var(--border-color);border-radius:100px;font-family:'Montserrat',sans-serif;font-size:8px;font-weight:500;color:var(--gray-mid);cursor:pointer;transition:all 0.15s;white-space:nowrap; }
         .quick-chip:hover,.quick-chip.active { color:var(--gold-primary);border-color:var(--gold-primary);background:var(--gold-dim); }
-
         .btn-assess { width:100%;padding:13px;background:linear-gradient(135deg,var(--gold-primary),var(--gold-dark));border:none;border-radius:50px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;color:#000;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;margin-top:4px; }
         .btn-assess:hover:not(:disabled) { transform:translateY(-2px);box-shadow:0 10px 30px var(--gold-glow); }
         .btn-assess:disabled { opacity:0.4;cursor:not-allowed; }
-
         .scan-row { margin-top:12px;padding:10px 15px;background:var(--gold-dim);border:1px solid rgba(212,175,55,0.18);border-radius:12px;display:flex;align-items:center;gap:12px; }
         .scan-bar { width:56px;height:2px;background:var(--border-color);border-radius:1px;overflow:hidden;flex-shrink:0; }
         .scan-fill { height:100%;width:40%;background:var(--gold-primary);animation:scanAnim 1.4s ease-in-out infinite; }
         @keyframes scanAnim{0%{margin-left:-40%}100%{margin-left:100%}}
         .scan-txt { font-family:'Montserrat',sans-serif;font-size:9px;font-weight:600;color:var(--gold-primary);letter-spacing:1.5px; }
-
         .ai-result { margin-top:14px;border-radius:16px;border:1px solid;overflow:hidden;animation:fadeUp 0.3s ease; }
         .ai-top { padding:13px 17px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.05); }
         .ai-sev { font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700; }
@@ -803,35 +802,29 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
         .btn-redo:hover { color:var(--text-primary); }
         .btn-join { flex:1;padding:10px;background:rgba(58,170,110,0.08);color:#3aaa6e;border:1px solid rgba(58,170,110,0.28);border-radius:50px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all 0.2s; }
         .btn-join:hover { background:rgba(58,170,110,0.15); }
-
         .token-hero-banner { padding:20px 22px 18px;border-bottom:1px solid var(--border-color);background:linear-gradient(135deg,rgba(212,175,55,0.05),transparent);display:flex;align-items:center;justify-content:space-between;gap:16px; }
         .token-eyebrow { font-family:'Montserrat',sans-serif;font-size:7px;font-weight:700;color:var(--gray-mid);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px; }
         .token-number-display { font-family:'Cormorant Garamond',serif;font-size:72px;font-weight:700;line-height:1;letter-spacing:-3px;background:linear-gradient(135deg,var(--gold-primary),var(--gold-light));-webkit-background-clip:text;background-clip:text;color:transparent; }
         .token-subline { font-family:'Montserrat',sans-serif;font-size:8px;color:var(--gray-mid);letter-spacing:1.5px;display:flex;align-items:center;gap:6px;margin-top:4px; }
-
         .queue-hero { padding:14px 20px 18px; }
         .queue-top { display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;margin-bottom:18px; }
         .divider-v { width:1px;height:80px;background:var(--border-color); }
         .live-dot { width:5px;height:5px;border-radius:50%;background:#3aaa6e;box-shadow:0 0 5px #3aaa6e;display:inline-block;animation:breathe 2s ease-in-out infinite; }
         @keyframes breathe{0%,100%{opacity:1}50%{opacity:0.35}}
-
         .stats-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px; }
         .s-box { background:var(--surface);border:1px solid var(--border-color);border-radius:13px;padding:13px;text-align:center; }
         .s-val { font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--text-primary);line-height:1;font-weight:600; }
         .s-lbl { font-family:'Montserrat',sans-serif;font-size:7px;color:var(--gray-mid);letter-spacing:2px;text-transform:uppercase;margin-top:4px; }
-
         .pos-bar-labels { display:flex;justify-content:space-between;font-family:'Montserrat',sans-serif;font-size:8px;color:var(--gray-mid);margin-bottom:6px; }
         .pos-bar { height:8px;background:var(--border-color);border-radius:4px;overflow:hidden;display:flex;margin-bottom:14px; }
         .next-alert { background:rgba(58,170,110,0.08);border:1px solid rgba(58,170,110,0.25);border-radius:13px;padding:11px 15px;text-align:center;margin-bottom:10px;animation:pulseAlert 2s ease-in-out infinite; }
         @keyframes pulseAlert{0%,100%{box-shadow:none}50%{box-shadow:0 0 16px rgba(58,170,110,0.18)}}
-
         .tab-bar { display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border-color);border-bottom:1px solid var(--border-color);background:var(--surface); }
         .tab-btn { padding:11px;font-family:'Montserrat',sans-serif;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;background:transparent;color:var(--gray-mid);cursor:pointer;transition:all 0.2s;position:relative; }
         .tab-btn::after { content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--gold-primary);transform:scaleX(0);transition:transform 0.25s; }
         .tab-btn.active { color:var(--gold-primary);background:var(--card-bg); }
         .tab-btn.active::after { transform:scaleX(1); }
         .tab-content { padding:18px 20px;min-height:140px; }
-
         .tip-item { display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-bottom:1px solid var(--border-color); }
         .tip-item:last-child { border-bottom:none; }
         .tip-num { font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold-primary);font-weight:600;flex-shrink:0;line-height:1.2; }
@@ -842,7 +835,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
         .action-icon { font-size:20px; }
         .action-label { font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;color:var(--gold-primary);letter-spacing:1px;text-transform:uppercase; }
         .action-sub { font-family:'Cormorant Garamond',serif;font-size:12px;color:var(--gray-mid); }
-
         .hist-slide { overflow:hidden;max-height:0;transition:max-height 0.35s ease;background:var(--surface);border-bottom:1px solid var(--border-color); }
         .hist-slide.open { max-height:260px; }
         .hist-list { padding:12px;display:flex;flex-direction:column;gap:7px;max-height:230px;overflow-y:auto; }
@@ -851,19 +843,15 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
         .hist-item { display:flex;align-items:center;gap:9px;padding:9px 13px;background:var(--card-bg);border:1px solid var(--border-color);border-radius:11px; }
         .hist-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0; }
         .hist-badge { font-family:'Montserrat',sans-serif;font-size:8px;font-weight:700;padding:2px 9px;border-radius:100px;border:1px solid;flex-shrink:0; }
-
         .new-visit-section { padding:16px 20px;border-top:1px solid var(--border-color); }
         .btn-new-visit { width:100%;padding:12px;background:transparent;border:1px solid var(--border-color);border-radius:50px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;color:var(--gray-mid);letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all 0.25s; }
         .btn-new-visit:hover { border-color:#e8503a;color:#e8503a; }
-
         .error-msg { color:#e8503a;font-family:'Montserrat',sans-serif;font-size:11px;margin-top:10px;padding:9px 13px;background:rgba(232,80,58,0.07);border-radius:11px;border:1px solid rgba(232,80,58,0.2); }
-
         .panel-card { background:var(--card-bg);border:1px solid var(--border-color);border-radius:24px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,0.1);height:calc(100vh - 120px);max-height:700px;display:flex;flex-direction:column;position:sticky;top:20px; }
         .panel-head { padding:13px 18px;background:var(--surface);border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
         .panel-title { font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;color:var(--gold-primary);letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:7px; }
         .panel-close { width:26px;height:26px;border-radius:50%;border:1px solid var(--border-color);background:transparent;color:var(--gray-mid);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.2s; }
         .panel-close:hover { color:#e8503a;border-color:rgba(232,80,58,0.3); }
-
         .queue-preview-body { flex:1;overflow-y:auto;padding:14px; }
         .queue-preview-body::-webkit-scrollbar { width:3px; }
         .queue-preview-body::-webkit-scrollbar-thumb { background:var(--border-color);border-radius:2px; }
@@ -877,7 +865,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
         .dist-col { flex:1;display:flex;flex-direction:column;align-items:center;gap:2px; }
         .dist-bar-inner { width:100%;border-radius:3px 3px 0 0;transition:height 0.5s ease;min-height:2px; }
         .dist-lbl-text { font-family:'Montserrat',sans-serif;font-size:6px;color:var(--gray-mid); }
-
         .chat-body-panel { flex:1;overflow-y:auto;padding:14px 14px 8px;display:flex;flex-direction:column;gap:4px; }
         .chat-body-panel::-webkit-scrollbar { width:3px; }
         .chat-body-panel::-webkit-scrollbar-thumb { background:var(--border-color);border-radius:2px; }
@@ -899,7 +886,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
         .chat-quick-wrap { padding:8px 14px 0;display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0; }
         .chat-quick-btn { padding:4px 10px;background:var(--surface2);border:1px solid var(--border-color);border-radius:100px;font-family:'Montserrat',sans-serif;font-size:8px;color:var(--gray-mid);cursor:pointer;transition:all 0.15s;white-space:nowrap; }
         .chat-quick-btn:hover { color:var(--gold-primary);border-color:var(--gold-primary);background:var(--gold-dim); }
-
         @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes fadeSlideIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
         @keyframes popIn{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
@@ -909,7 +895,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
         @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
         @keyframes cardIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
         .pos-flash { animation:posFlash 0.8s ease; }
-
         @media(max-width:900px) {
           .side-panel.open { width:100%;position:fixed;bottom:0;left:0;right:0;z-index:200;height:60vh;border-radius:20px 20px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,0.25); }
           .panel-card { height:100%;max-height:100%;border-radius:20px 20px 0 0; }
@@ -924,7 +909,7 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
 
       <div className="bg-orb orb-1"/><div className="bg-orb orb-2"/>
 
-      {/* Profile Modal */}
+      {/* ── Profile Modal ── */}
       {showProfile && (
         <ProfileModal
           patient={patient}
@@ -932,6 +917,44 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
           onClose={() => setShowProfile(false)}
           onUpdate={p => { updatePatient(p); setProfilePhoto(localStorage.getItem("mq-profile-photo") || ""); }}
         />
+      )}
+
+      {/* ── Emergency Admit Modal ── */}
+      {showEmergencyModal && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.8)", backdropFilter:"blur(10px)", zIndex:1100, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
+          <div style={{ background:"var(--card-bg)", border:"1px solid rgba(232,80,58,0.4)", borderRadius:24, maxWidth:420, width:"100%", padding:28, boxShadow:"0 40px 80px rgba(232,80,58,0.2)", animation:"fadeUp 0.25s ease" }}>
+            <div style={{ textAlign:"center", marginBottom:20 }}>
+              <div style={{ fontSize:40, marginBottom:10 }}>🚨</div>
+              <div style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:28, fontWeight:700, color:"#e8503a" }}>Emergency Admit</div>
+              <div style={{ fontFamily:"'Montserrat',sans-serif", fontSize:9, color:"var(--gray-mid)", marginTop:6, letterSpacing:"1px" }}>
+                You will be assigned Priority 5 — Critical and placed at the top of the queue.
+              </div>
+            </div>
+            <label style={{ display:"block", fontFamily:"'Montserrat',sans-serif", fontSize:9, fontWeight:600, color:"var(--gray-mid)", letterSpacing:"2px", textTransform:"uppercase", marginBottom:8 }}>
+              Patient Name (optional)
+            </label>
+            <input
+              type="text"
+              value={emergencyName}
+              onChange={e => setEmergencyName(e.target.value)}
+              placeholder={patient?.name ?? "Enter name…"}
+              style={{ width:"100%", padding:"12px 15px", background:"var(--input-bg)", border:"1px solid var(--border-color)", borderRadius:13, color:"var(--text-primary)", fontFamily:"'Cormorant Garamond',serif", fontSize:16, outline:"none", marginBottom:16 }}
+            />
+            <button
+              onClick={submitEmergency}
+              disabled={emergencyLoading}
+              style={{ width:"100%", padding:"13px", background:"linear-gradient(135deg,#e8503a,#c0392b)", border:"none", borderRadius:50, fontFamily:"'Montserrat',sans-serif", fontSize:12, fontWeight:800, color:"#fff", letterSpacing:"1.5px", cursor:"pointer", marginBottom:10, opacity: emergencyLoading ? 0.6 : 1 }}
+            >
+              {emergencyLoading ? "Admitting…" : "🚨 Confirm Emergency Admit"}
+            </button>
+            <button
+              onClick={() => { setShowEmergencyModal(false); setEmergencyName(""); }}
+              style={{ width:"100%", padding:"11px", background:"transparent", border:"1px solid var(--border-color)", borderRadius:50, fontFamily:"'Montserrat',sans-serif", fontSize:11, fontWeight:600, color:"var(--gray-mid)", cursor:"pointer" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
 
       <div className="page-shell">
@@ -942,7 +965,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
             <div className="tagline">Patient Portal</div>
           </div>
           <div className="header-right">
-            {/* Avatar → opens Profile modal */}
             <button className="avatar-btn" onClick={() => setShowProfile(true)} title="My Profile">
               {profilePhoto
                 ? <img src={profilePhoto} alt="profile" style={{ width:"100%", height:"100%", objectFit:"cover", borderRadius:"50%" }}/>
@@ -1038,10 +1060,33 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
                     </div>
 
                     {!aiResult && (
-                      <button className="btn-assess" onClick={assessAndSubmit} disabled={aiLoading||(!condition.trim()&&checkedSymptoms.length===0)}>
-                        {aiLoading?"Analysing…":"Get AI Assessment →"}
-                      </button>
+                      <>
+                        <button className="btn-assess" onClick={assessAndSubmit} disabled={aiLoading||(!condition.trim()&&checkedSymptoms.length===0)}>
+                          {aiLoading?"Analysing…":"Get AI Assessment →"}
+                        </button>
+
+                        {/* Emergency Admit Button */}
+                        <div style={{ marginTop:10 }}>
+                          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+                            <div style={{ flex:1, height:1, background:"var(--border-color)" }}/>
+                            <span style={{ fontFamily:"'Montserrat',sans-serif", fontSize:8, color:"var(--gray-mid)", letterSpacing:"2px", textTransform:"uppercase" }}>or</span>
+                            <div style={{ flex:1, height:1, background:"var(--border-color)" }}/>
+                          </div>
+                          <button
+                            onClick={() => setShowEmergencyModal(true)}
+                            style={{ width:"100%", padding:"13px", background:"linear-gradient(135deg,#e8503a,#c0392b)", border:"none", borderRadius:50, fontFamily:"'Montserrat',sans-serif", fontSize:12, fontWeight:800, color:"#fff", letterSpacing:"1.5px", textTransform:"uppercase", cursor:"pointer", transition:"all 0.3s", boxShadow:"0 6px 24px rgba(232,80,58,0.35)", display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}
+                            onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-2px)")}
+                            onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}
+                          >
+                            🚨 Emergency Admit
+                          </button>
+                          <div style={{ textAlign:"center", marginTop:6, fontFamily:"'Montserrat',sans-serif", fontSize:8, color:"var(--gray-mid)" }}>
+                            Critical — skip triage, admit immediately
+                          </div>
+                        </div>
+                      </>
                     )}
+
                     {aiLoading && (
                       <div className="scan-row">
                         <div className="scan-bar"><div className="scan-fill"/></div>
@@ -1082,7 +1127,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
                     {myEntry?.boosted && <span style={{fontFamily:"'Montserrat',sans-serif",fontSize:9,color:"#c4a832",background:"rgba(196,168,50,0.07)",border:"1px solid rgba(196,168,50,0.2)",padding:"4px 13px",borderRadius:100,letterSpacing:"1.5px",fontWeight:600}}>⚡ Priority Boosted</span>}
                   </div>
 
-                  {/* Token Hero — shows as soon as tokenStr is available */}
                   <div className="token-hero-banner">
                     <div>
                       <div className="token-eyebrow">Your Token Number</div>
@@ -1104,7 +1148,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
                     )}
                   </div>
 
-                  {/* Queue stats */}
                   {myEntry ? (
                     <div className="queue-hero">
                       <div className="queue-top">
@@ -1152,7 +1195,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
                       )}
                     </div>
                   ) : (
-                    /* Waiting for first poll to return the entry */
                     <div style={{padding:"20px 22px 18px"}}>
                       <div className="stats-grid">
                         {["Position","In Queue","Wait"].map(lbl => (
@@ -1169,7 +1211,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
                     </div>
                   )}
 
-                  {/* Tabs */}
                   <div className="tab-bar">
                     {[{id:"status",label:"Timeline"},{id:"tips",label:"Health Tips"},{id:"actions",label:"Quick Help"}].map(t=>(
                       <button key={t.id} className={`tab-btn ${activeTab===t.id?"active":""}`} onClick={()=>setActiveTab(t.id as any)}>{t.label}</button>
@@ -1227,7 +1268,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
                       <div className="queue-stat-lbl">Critical/Severe</div>
                     </div>
                   </div>
-
                   {queueSize > 0 && (
                     <>
                       <div style={{fontFamily:"'Montserrat',sans-serif",fontSize:8,fontWeight:700,color:"var(--gray-mid)",letterSpacing:"2px",textTransform:"uppercase",marginBottom:6}}>Priority Mix</div>
@@ -1245,7 +1285,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
                       </div>
                     </>
                   )}
-
                   {queueSize === 0 ? (
                     <div style={{textAlign:"center",padding:"40px 20px",fontFamily:"'Cormorant Garamond',serif",fontSize:18,color:"var(--gray-mid)"}}>Queue is empty</div>
                   ) : (
@@ -1302,7 +1341,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
                   ))}
                   <div ref={chatEndRef}/>
                 </div>
-
                 {chatMsgs.length <= 1 && (
                   <div className="chat-quick-wrap">
                     {CHAT_QUICK_Qs.map((q,i)=>(
@@ -1310,7 +1348,6 @@ waitSeconds: Math.max(0, i * 300), // 5 min per position ahead of you
                     ))}
                   </div>
                 )}
-
                 <div className="chat-input-row">
                   <textarea ref={chatInputRef} className="chat-input"
                     placeholder="Ask about your health or visit…"
