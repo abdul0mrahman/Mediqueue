@@ -1,27 +1,39 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import dynamic from "next/dynamic";
+
+// Force dynamic rendering to prevent static prerendering
+export const dynamic = 'force-dynamic';
 
 export default function PatientLoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState<"login"|"register">("login");
   const [theme, setTheme] = useState<"dark"|"light">("dark");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-const searchParams = useSearchParams();
-const isEmergency = searchParams.get("emergency") === "true";
-const [emergencyName, setEmergencyName] = useState("");
+  const [mounted, setMounted] = useState(false); // Track client-side mount
+  
+  const isEmergency = searchParams?.get("emergency") === "true";
+  const [emergencyName, setEmergencyName] = useState("");
   const [login, setLogin] = useState({ username: "", password: "" });
   const [reg, setReg] = useState({
     username: "", password: "", confirmPassword: "",
     name: "", age: "", gender: "", phone: "", bloodType: "", emergencyContact: ""
   });
 
-  // Apply theme on mount
+  // Mark component as mounted on client
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Apply theme only on client side
+  useEffect(() => {
+    if (!mounted) return;
+    
     const getSystemTheme = () => {
       return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
     };
@@ -74,7 +86,7 @@ const [emergencyName, setEmergencyName] = useState("");
     return () => {
       mediaQuery.removeEventListener("change", handleThemeChange);
     };
-  }, []);
+  }, [mounted]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -110,6 +122,33 @@ const [emergencyName, setEmergencyName] = useState("");
       setLogin({ username: reg.username, password: "" });
     } catch { setError("Connection error. Try again."); }
     setLoading(false);
+  }
+
+  // Show loading state while mounting to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div style={{ 
+        minHeight: "100vh", 
+        display: "flex", 
+        alignItems: "center", 
+        justifyContent: "center",
+        background: "#000"
+      }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ 
+            fontFamily: "'Great Vibes', cursive", 
+            fontSize: "36px", 
+            background: "linear-gradient(135deg, #D4AF37, #F3D572)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent"
+          }}>
+            MediQueue
+          </div>
+          <div style={{ marginTop: "20px", color: "#888" }}>Loading...</div>
+        </div>
+      </div>
+    );
   }
 
   return (
