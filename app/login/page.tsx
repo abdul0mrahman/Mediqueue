@@ -1,42 +1,37 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 
-// Force dynamic rendering to prevent static prerendering
 export const dynamic = 'force-dynamic';
 
-export default function PatientLoginPage() {
+// ─── Inner component (uses useSearchParams) ───────────────────────────────────
+function PatientLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [tab, setTab] = useState<"login"|"register">("login");
-  const [theme, setTheme] = useState<"dark"|"light">("dark");
+  const [tab, setTab] = useState<"login" | "register">("login");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [mounted, setMounted] = useState(false); // Track client-side mount
-  
+  const [mounted, setMounted] = useState(false);
+
   const isEmergency = searchParams?.get("emergency") === "true";
-  const [emergencyName, setEmergencyName] = useState("");
   const [login, setLogin] = useState({ username: "", password: "" });
   const [reg, setReg] = useState({
     username: "", password: "", confirmPassword: "",
     name: "", age: "", gender: "", phone: "", bloodType: "", emergencyContact: ""
   });
 
-  // Mark component as mounted on client
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Apply theme only on client side
   useEffect(() => {
     if (!mounted) return;
-    
-    const getSystemTheme = () => {
-      return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-    };
+
+    const getSystemTheme = () =>
+      window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
 
     const applyTheme = (themeValue: string) => {
       document.documentElement.setAttribute("data-theme", themeValue);
@@ -64,28 +59,21 @@ export default function PatientLoginPage() {
       applyTheme(getSystemTheme());
     }
 
-    // Listen for system theme changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
     const handleThemeChange = (e: MediaQueryListEvent) => {
       const newTheme = e.matches ? "light" : "dark";
-      const hasUserPreference = localStorage.getItem("mq-theme") || 
+      const hasUserPreference = localStorage.getItem("mq-theme") ||
         (() => {
           try {
             const settings = localStorage.getItem("mq-settings");
             return settings && JSON.parse(settings).theme;
           } catch { return false; }
         })();
-      
-      if (!hasUserPreference) {
-        applyTheme(newTheme);
-      }
+      if (!hasUserPreference) applyTheme(newTheme);
     };
 
     mediaQuery.addEventListener("change", handleThemeChange);
-    
-    return () => {
-      mediaQuery.removeEventListener("change", handleThemeChange);
-    };
+    return () => mediaQuery.removeEventListener("change", handleThemeChange);
   }, [mounted]);
 
   async function handleLogin(e: React.FormEvent) {
@@ -124,27 +112,18 @@ export default function PatientLoginPage() {
     setLoading(false);
   }
 
-  // Show loading state while mounting to prevent hydration mismatch
   if (!mounted) {
     return (
-      <div style={{ 
-        minHeight: "100vh", 
-        display: "flex", 
-        alignItems: "center", 
-        justifyContent: "center",
-        background: "#000"
+      <div style={{
+        minHeight: "100vh", display: "flex", alignItems: "center",
+        justifyContent: "center", background: "#000"
       }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ 
-            fontFamily: "'Great Vibes', cursive", 
-            fontSize: "36px", 
+          <div style={{
+            fontFamily: "'Great Vibes', cursive", fontSize: "36px",
             background: "linear-gradient(135deg, #D4AF37, #F3D572)",
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            color: "transparent"
-          }}>
-            MediQueue
-          </div>
+            WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent"
+          }}>MediQueue</div>
           <div style={{ marginTop: "20px", color: "#888" }}>Loading...</div>
         </div>
       </div>
@@ -154,19 +133,11 @@ export default function PatientLoginPage() {
   return (
     <>
       <style>{`
-        /* Premium Font Imports */
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Great+Vibes&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-          -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        /* Theme Variables - Light & Dark Mode */
         :root {
-          /* Light Mode Default */
           --pure-black: #000000;
           --rich-black: #0a0a0a;
           --onyx: #111111;
@@ -190,19 +161,7 @@ export default function PatientLoginPage() {
           --dropdown-hover: #F5F5F5;
         }
 
-        /* Dark Mode */
         [data-theme="dark"] {
-          --pure-black: #000000;
-          --rich-black: #0a0a0a;
-          --onyx: #111111;
-          --gold-primary: #D4AF37;
-          --gold-light: #F3D572;
-          --gold-dark: #B38F2F;
-          --gold-glow: rgba(212, 175, 55, 0.3);
-          --white: #FFFFFF;
-          --off-white: #FAF9F6;
-          --gray-light: #E5E5E5;
-          --gray-mid: #888888;
           --bg-primary: #000000;
           --bg-secondary: #0a0a0a;
           --text-primary: #FFFFFF;
@@ -224,7 +183,6 @@ export default function PatientLoginPage() {
           transition: background 0.3s ease, color 0.3s ease;
         }
 
-        /* Animated Background Orbs */
         .bg-orb {
           position: fixed;
           border-radius: 50%;
@@ -236,35 +194,22 @@ export default function PatientLoginPage() {
           transition: opacity 0.3s ease;
         }
 
-        [data-theme="light"] .bg-orb {
-          opacity: 0.15;
-        }
+        [data-theme="light"] .bg-orb { opacity: 0.15; }
 
         .orb-1 {
-          width: 60vw;
-          height: 60vw;
+          width: 60vw; height: 60vw;
           background: radial-gradient(circle, var(--gold-primary), transparent);
-          top: -20%;
-          right: -20%;
-          animation-delay: 0s;
+          top: -20%; right: -20%; animation-delay: 0s;
         }
-
         .orb-2 {
-          width: 50vw;
-          height: 50vw;
+          width: 50vw; height: 50vw;
           background: radial-gradient(circle, rgba(212, 175, 55, 0.4), transparent);
-          bottom: -30%;
-          left: -20%;
-          animation-delay: -5s;
+          bottom: -30%; left: -20%; animation-delay: -5s;
         }
-
         .orb-3 {
-          width: 40vw;
-          height: 40vw;
+          width: 40vw; height: 40vw;
           background: radial-gradient(circle, rgba(212, 175, 55, 0.2), transparent);
-          top: 40%;
-          left: 30%;
-          animation-delay: -10s;
+          top: 40%; left: 30%; animation-delay: -10s;
         }
 
         @keyframes float {
@@ -273,7 +218,6 @@ export default function PatientLoginPage() {
           66% { transform: translate(-3%, 3%) scale(0.95); }
         }
 
-        /* Main Content */
         .page {
           min-height: 100vh;
           display: flex;
@@ -287,21 +231,11 @@ export default function PatientLoginPage() {
         }
 
         @keyframes contentFadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Logo Section */
-        .logo {
-          text-align: center;
-          margin-bottom: 40px;
-        }
+        .logo { text-align: center; margin-bottom: 40px; }
 
         .wordmark {
           font-family: 'Great Vibes', cursive;
@@ -322,7 +256,6 @@ export default function PatientLoginPage() {
           margin-top: 8px;
         }
 
-        /* Card */
         .card {
           background: var(--card-bg);
           backdrop-filter: blur(10px);
@@ -335,7 +268,6 @@ export default function PatientLoginPage() {
           transition: all 0.3s ease;
         }
 
-        /* Tabs */
         .tab-row {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -361,32 +293,18 @@ export default function PatientLoginPage() {
         .tab-btn::after {
           content: '';
           position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
+          bottom: 0; left: 0; right: 0;
           height: 2px;
           background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
           transform: scaleX(0);
           transition: transform 0.3s ease;
         }
 
-        .tab-btn.active {
-          color: var(--gold-primary);
-          background: var(--card-bg);
-        }
+        .tab-btn.active { color: var(--gold-primary); background: var(--card-bg); }
+        .tab-btn.active::after { transform: scaleX(1); }
+        .tab-btn:hover:not(.active) { color: var(--text-primary); }
 
-        .tab-btn.active::after {
-          transform: scaleX(1);
-        }
-
-        .tab-btn:hover:not(.active) {
-          color: var(--text-primary);
-        }
-
-        /* Form */
-        .form-body {
-          padding: 32px;
-        }
+        .form-body { padding: 32px; }
 
         .section-title {
           font-family: 'Montserrat', sans-serif;
@@ -400,21 +318,11 @@ export default function PatientLoginPage() {
           border-top: 1px solid var(--border-color);
         }
 
-        .section-title:first-of-type {
-          margin-top: 0;
-          padding-top: 0;
-          border-top: none;
-        }
+        .section-title:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
 
-        .row2 {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-        }
+        .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-        .field {
-          margin-bottom: 16px;
-        }
+        .field { margin-bottom: 16px; }
 
         .field-label {
           display: block;
@@ -446,13 +354,8 @@ export default function PatientLoginPage() {
           box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
         }
 
-        .field-input::placeholder {
-          color: var(--gray-mid);
-          font-family: 'Cormorant Garamond', serif;
-          opacity: 0.6;
-        }
+        .field-input::placeholder { color: var(--gray-mid); font-family: 'Cormorant Garamond', serif; opacity: 0.6; }
 
-        /* Dropdown Specific Styles */
         select.field-input {
           cursor: pointer;
           appearance: none;
@@ -463,7 +366,6 @@ export default function PatientLoginPage() {
           color: var(--text-primary);
         }
 
-        /* Style dropdown options */
         select.field-input option {
           background-color: var(--dropdown-bg);
           color: var(--dropdown-text);
@@ -472,25 +374,9 @@ export default function PatientLoginPage() {
           font-size: 14px;
         }
 
-        /* For Firefox */
-        select.field-input:-moz-focusring {
-          color: transparent;
-          text-shadow: 0 0 0 var(--text-primary);
-        }
+        select.field-input:-moz-focusring { color: transparent; text-shadow: 0 0 0 var(--text-primary); }
+        select.field-input::-ms-expand { display: none; }
 
-        /* For better dropdown styling in all browsers */
-        select.field-input::-ms-expand {
-          display: none;
-        }
-
-        /* Hover effect for options */
-        select.field-input option:hover,
-        select.field-input option:focus,
-        select.field-input option:active {
-          background-color: var(--dropdown-hover);
-        }
-
-        /* Buttons */
         .btn-submit {
           width: 100%;
           padding: 14px;
@@ -513,29 +399,16 @@ export default function PatientLoginPage() {
         .btn-submit::before {
           content: '';
           position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
+          top: 0; left: -100%;
+          width: 100%; height: 100%;
           background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
           transition: left 0.5s ease;
         }
 
-        .btn-submit:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 30px var(--gold-glow);
-        }
+        .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 30px var(--gold-glow); }
+        .btn-submit:hover:not(:disabled)::before { left: 100%; }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .btn-submit:hover:not(:disabled)::before {
-          left: 100%;
-        }
-
-        .btn-submit:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        /* Messages */
         .error {
           color: #e8503a;
           font-size: 12px;
@@ -560,7 +433,6 @@ export default function PatientLoginPage() {
           font-weight: 500;
         }
 
-        /* Footer Link */
         .footer-link {
           text-align: center;
           margin-top: 28px;
@@ -577,35 +449,19 @@ export default function PatientLoginPage() {
           transition: all 0.3s ease;
         }
 
-        .footer-link a:hover {
-          text-decoration: underline;
-          text-shadow: 0 0 10px var(--gold-glow);
-        }
+        .footer-link a:hover { text-decoration: underline; text-shadow: 0 0 10px var(--gold-glow); }
 
-        /* Responsive */
         @media (max-width: 768px) {
-          .form-body {
-            padding: 24px;
-          }
-          
-          .wordmark {
-            font-size: 36px;
-          }
+          .form-body { padding: 24px; }
+          .wordmark { font-size: 36px; }
         }
 
         @media (max-width: 480px) {
-          .form-body {
-            padding: 20px;
-          }
-          
-          .row2 {
-            grid-template-columns: 1fr;
-            gap: 0;
-          }
+          .form-body { padding: 20px; }
+          .row2 { grid-template-columns: 1fr; gap: 0; }
         }
       `}</style>
 
-      {/* Animated Background Orbs */}
       <div className="bg-orb orb-1"></div>
       <div className="bg-orb orb-2"></div>
       <div className="bg-orb orb-3"></div>
@@ -618,27 +474,33 @@ export default function PatientLoginPage() {
 
         <div className="card">
           <div className="tab-row">
-            <button className={`tab-btn ${tab==="login"?"active":""}`} onClick={()=>{setTab("login");setError("");setSuccess("");}}>
+            <button
+              className={`tab-btn ${tab === "login" ? "active" : ""}`}
+              onClick={() => { setTab("login"); setError(""); setSuccess(""); }}
+            >
               Sign In
             </button>
-            <button className={`tab-btn ${tab==="register"?"active":""}`} onClick={()=>{setTab("register");setError("");setSuccess("");}}>
+            <button
+              className={`tab-btn ${tab === "register" ? "active" : ""}`}
+              onClick={() => { setTab("register"); setError(""); setSuccess(""); }}
+            >
               Create Account
             </button>
           </div>
 
-          {tab==="login" && (
+          {tab === "login" && (
             <form className="form-body" onSubmit={handleLogin}>
               {error && <div className="error">{error}</div>}
               {success && <div className="success">{success}</div>}
               <div className="field">
                 <label className="field-label">Username</label>
                 <input className="field-input" placeholder="Enter your username" value={login.username}
-                  onChange={e=>setLogin(l=>({...l,username:e.target.value}))} autoComplete="username" required />
+                  onChange={e => setLogin(l => ({ ...l, username: e.target.value }))} autoComplete="username" required />
               </div>
               <div className="field">
                 <label className="field-label">Password</label>
                 <input className="field-input" type="password" placeholder="Enter your password" value={login.password}
-                  onChange={e=>setLogin(l=>({...l,password:e.target.value}))} autoComplete="current-password" required />
+                  onChange={e => setLogin(l => ({ ...l, password: e.target.value }))} autoComplete="current-password" required />
               </div>
               <button className="btn-submit" type="submit" disabled={loading}>
                 {loading ? "Authenticating..." : "Access Portal →"}
@@ -646,7 +508,7 @@ export default function PatientLoginPage() {
             </form>
           )}
 
-          {tab==="register" && (
+          {tab === "register" && (
             <form className="form-body" onSubmit={handleRegister}>
               {error && <div className="error">{error}</div>}
 
@@ -654,18 +516,18 @@ export default function PatientLoginPage() {
               <div className="field">
                 <label className="field-label">Username</label>
                 <input className="field-input" placeholder="Choose a unique username" value={reg.username}
-                  onChange={e=>setReg(r=>({...r,username:e.target.value}))} required />
+                  onChange={e => setReg(r => ({ ...r, username: e.target.value }))} required />
               </div>
               <div className="row2">
                 <div className="field">
                   <label className="field-label">Password</label>
                   <input className="field-input" type="password" placeholder="Minimum 6 characters" value={reg.password}
-                    onChange={e=>setReg(r=>({...r,password:e.target.value}))} required />
+                    onChange={e => setReg(r => ({ ...r, password: e.target.value }))} required />
                 </div>
                 <div className="field">
                   <label className="field-label">Confirm Password</label>
                   <input className="field-input" type="password" placeholder="Repeat your password" value={reg.confirmPassword}
-                    onChange={e=>setReg(r=>({...r,confirmPassword:e.target.value}))} required />
+                    onChange={e => setReg(r => ({ ...r, confirmPassword: e.target.value }))} required />
                 </div>
               </div>
 
@@ -673,17 +535,17 @@ export default function PatientLoginPage() {
               <div className="field">
                 <label className="field-label">Full Name</label>
                 <input className="field-input" placeholder="As per government ID" value={reg.name}
-                  onChange={e=>setReg(r=>({...r,name:e.target.value}))} required />
+                  onChange={e => setReg(r => ({ ...r, name: e.target.value }))} required />
               </div>
               <div className="row2">
                 <div className="field">
                   <label className="field-label">Age</label>
                   <input className="field-input" type="number" placeholder="Years" min="0" max="120" value={reg.age}
-                    onChange={e=>setReg(r=>({...r,age:e.target.value}))} required />
+                    onChange={e => setReg(r => ({ ...r, age: e.target.value }))} required />
                 </div>
                 <div className="field">
                   <label className="field-label">Gender</label>
-                  <select className="field-input" value={reg.gender} onChange={e=>setReg(r=>({...r,gender:e.target.value}))} required>
+                  <select className="field-input" value={reg.gender} onChange={e => setReg(r => ({ ...r, gender: e.target.value }))} required>
                     <option value="">Select gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -695,9 +557,9 @@ export default function PatientLoginPage() {
               <div className="row2">
                 <div className="field">
                   <label className="field-label">Blood Type</label>
-                  <select className="field-input" value={reg.bloodType} onChange={e=>setReg(r=>({...r,bloodType:e.target.value}))} required>
+                  <select className="field-input" value={reg.bloodType} onChange={e => setReg(r => ({ ...r, bloodType: e.target.value }))} required>
                     <option value="">Select blood type</option>
-                    {["A+","A−","B+","B−","AB+","AB−","O+","O−"].map(b=>(
+                    {["A+", "A−", "B+", "B−", "AB+", "AB−", "O+", "O−"].map(b => (
                       <option key={b} value={b}>{b}</option>
                     ))}
                   </select>
@@ -705,13 +567,13 @@ export default function PatientLoginPage() {
                 <div className="field">
                   <label className="field-label">Phone Number</label>
                   <input className="field-input" type="tel" placeholder="+91 XXXXXXXXXX" value={reg.phone}
-                    onChange={e=>setReg(r=>({...r,phone:e.target.value}))} required />
+                    onChange={e => setReg(r => ({ ...r, phone: e.target.value }))} required />
                 </div>
               </div>
               <div className="field">
                 <label className="field-label">Emergency Contact</label>
                 <input className="field-input" placeholder="Name & phone number" value={reg.emergencyContact}
-                  onChange={e=>setReg(r=>({...r,emergencyContact:e.target.value}))} required />
+                  onChange={e => setReg(r => ({ ...r, emergencyContact: e.target.value }))} required />
               </div>
 
               <button className="btn-submit" type="submit" disabled={loading}>
@@ -722,10 +584,42 @@ export default function PatientLoginPage() {
         </div>
 
         <div className="footer-link">
-          <span style={{opacity: 0.6}}>Healthcare professional? </span>
+          <span style={{ opacity: 0.6 }}>Healthcare professional? </span>
           <Link href="/admin/login">Access Staff Portal →</Link>
         </div>
       </div>
     </>
+  );
+}
+
+// ─── Fallback shown while Suspense resolves ───────────────────────────────────
+function LoginFallback() {
+  return (
+    <div style={{
+      minHeight: "100vh", display: "flex", alignItems: "center",
+      justifyContent: "center", background: "#000"
+    }}>
+      <div style={{ textAlign: "center" }}>
+        <div style={{
+          fontFamily: "'Great Vibes', cursive", fontSize: "36px",
+          background: "linear-gradient(135deg, #D4AF37, #F3D572)",
+          WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent"
+        }}>
+          MediQueue
+        </div>
+        <div style={{ marginTop: "20px", color: "#888", fontFamily: "sans-serif", fontSize: "13px" }}>
+          Loading...
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Default export: Suspense wrapper (fixes prerender error) ─────────────────
+export default function PatientLoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <PatientLoginContent />
+    </Suspense>
   );
 }
