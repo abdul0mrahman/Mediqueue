@@ -1,68 +1,68 @@
-generator client {
-  provider = "prisma-client-js"
-  output   = "../app/generated/prisma"
-}
+  generator client {
+    provider = "prisma-client-js"
+    output   = "../app/generated/prisma"
+  }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+  }
 
-model Notification {
-  id            Int      @id @default(autoincrement())
-  patientUserId Int
-  message       String
-  read          Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  date          DateTime @default(now())
-}
+  model Notification {
+    id            Int      @id @default(autoincrement())
+    patientUserId Int
+    message       String
+    read          Boolean  @default(false)
+    createdAt     DateTime @default(now())
+    date          DateTime @default(now())
+  }
 
-model Patient {
-  id               Int       @id @default(autoincrement())
-  name             String
-  condition        String
-  priority         Int
-  originalPriority Int
-  boosted          Boolean   @default(false)
-  boostReason      String?
-  enqueuedAt       DateTime  @default(now())
-  treatedAt        DateTime?
-  waitSeconds      Int       @default(0)
-  status           String    @default("waiting")
-  patientUserId    Int?
-  date             DateTime  @default(now())
-}
+  model Patient {
+    id               Int       @id @default(autoincrement())
+    name             String
+    condition        String
+    priority         Int
+    originalPriority Int
+    boosted          Boolean   @default(false)
+    boostReason      String?
+    enqueuedAt       DateTime  @default(now())
+    treatedAt        DateTime?
+    waitSeconds      Int       @default(0)
+    status           String    @default("waiting")
+    patientUserId    Int?
+    date             DateTime  @default(now())
+  }
 
-model BoostEvent {
-  id          Int      @id @default(autoincrement())
-  time        DateTime @default(now())
-  patientName String
-  oldPriority Int
-  newPriority Int
-  reason      String
-  date        DateTime @default(now())
-}
+  model BoostEvent {
+    id          Int      @id @default(autoincrement())
+    time        DateTime @default(now())
+    patientName String
+    oldPriority Int
+    newPriority Int
+    reason      String
+    date        DateTime @default(now())
+  }
 
-model PatientUser {
-  id               Int            @id @default(autoincrement())
-  username         String         @unique
-  password         String
-  name             String
-  age              Int
-  gender           String
-  phone            String
-  bloodType        String
-  emergencyContact String
-  createdAt        DateTime       @default(now())
-  visitHistory     VisitHistory[]
-}
+  model PatientUser {
+    id               Int            @id @default(autoincrement())
+    username         String         @unique
+    password         String
+    name             String
+    age              Int
+    gender           String
+    phone            String
+    bloodType        String
+    emergencyContact String
+    createdAt        DateTime       @default(now())
+    visitHistory     VisitHistory[]
+  }
 
-model VisitHistory {
-  id            Int         @id @default(autoincrement())
-  patientUserId Int
-  patientUser   PatientUser @relation(fields: [patientUserId], references: [id])
-  condition     String
-  priority      Int
-  createdAt     DateTime    @default(now())
-  date          DateTime    @default(now())
-}
+  model VisitHistory {
+    id            Int         @id @default(autoincrement())
+    patientUserId Int
+    patientUser   PatientUser @relation(fields: [patientUserId], references: [id])
+    condition     String
+    priority      Int
+    createdAt     DateTime    @default(now())
+    date          DateTime    @default(now())
+  }
