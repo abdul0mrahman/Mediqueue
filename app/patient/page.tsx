@@ -1,6 +1,7 @@
 "use client";
+export const dynamic = "force-dynamic";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 // ── Sound Effects ──────────────────────────────────────────────────────────
 function playJoinChime() {
@@ -412,7 +413,12 @@ function ProfileModal({ patient, history, onClose, onUpdate }: {
 // ═══════════════════════════════════════════════════════════════════════════
 export default function PatientPortal() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
+
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  setSearchParams(params);
+}, []);
 
   const [patient, setPatient]         = useState<PatientUser|null>(null);
   // ── FIX: store the raw queue entry id separately so token survives re-renders ──
@@ -473,7 +479,9 @@ export default function PatientPortal() {
     } catch {}
 
     // Check if this is an emergency session
-    const isEmergency = searchParams.get("emergency") === "true" || localStorage.getItem("mq-emergency") === "true";
+    const isEmergency =
+  searchParams?.get("emergency") === "true" ||
+  localStorage.getItem("mq-emergency") === "true";
 
     try {
       const savedPatient = localStorage.getItem("mq-patient");
